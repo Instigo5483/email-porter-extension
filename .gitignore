@@ -1,1 +1,17 @@
+# Claude Code
 .claude/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Build / packaging
+*.zip
+*.crx
