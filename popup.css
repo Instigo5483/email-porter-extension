@@ -1,0 +1,317 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #1a1b1e;
+  --surface: #25262b;
+  --border: #373a40;
+  --text: #c1c2c5;
+  --text-dim: #6c7086;
+  --accent-discord: #5865f2;
+  --accent-discord-hover: #4752c4;
+  --accent-whatsapp: #25d366;
+  --accent-whatsapp-hover: #1aad52;
+  --toggle-on: #5865f2;
+  --toggle-off: #373a40;
+  --status-info: #74c0fc;
+  --status-ok: #69db7c;
+  --status-err: #ff6b6b;
+  --radius: 8px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+body {
+  width: 320px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* ── View system ── */
+.container {
+  position: relative;
+  min-height: 120px;
+}
+
+.view {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.view.active {
+  display: flex;
+}
+
+/* ── Header ── */
+header {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: #fff;
+}
+
+/* ── View headers (for sub-views) ── */
+.view-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.view-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 5px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text);
+}
+
+/* ── Settings panel ── */
+.settings {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.toggle-row:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.toggle-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.toggle-wrap {
+  position: relative;
+  width: 38px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.toggle-wrap input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  background: var(--toggle-off);
+  border-radius: 22px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform 0.2s;
+}
+
+input:checked + .slider { background: var(--toggle-on); }
+input:checked + .slider::before { transform: translateX(16px); }
+
+/* ── Action buttons ── */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, opacity 0.15s;
+  color: #fff;
+}
+
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.btn-discord              { background: var(--accent-discord); }
+.btn-discord:not(:disabled):hover { background: var(--accent-discord-hover); }
+
+.btn-whatsapp             { background: var(--accent-whatsapp); }
+.btn-whatsapp:not(:disabled):hover { background: var(--accent-whatsapp-hover); }
+
+/* ── Status bar ── */
+.status {
+  min-height: 18px;
+  font-size: 12px;
+  padding: 2px 0;
+  transition: color 0.2s;
+  color: var(--text-dim);
+}
+
+.status.info  { color: var(--status-info); }
+.status.ok    { color: var(--status-ok); }
+.status.error { color: var(--status-err); }
+
+/* ── Picker list (emails / servers / channels) ── */
+.picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.picker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 13px;
+  color: var(--text);
+  text-align: left;
+  transition: background 0.12s;
+  width: 100%;
+}
+
+.picker-item:hover:not(:disabled) {
+  background: #2c2d32;
+  color: #fff;
+}
+
+.picker-item:disabled { opacity: 0.45; cursor: not-allowed; }
+
+.picker-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--border);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #aaa;
+  overflow: hidden;
+}
+
+.picker-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.picker-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.picker-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+.picker-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Discord sub-screens ── */
+.dc-screen { display: none; flex-direction: column; gap: 10px; }
+.dc-screen.active { display: flex; }
+
+/* ── Login box ── */
+.login-box {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.login-box p {
+  color: var(--text);
+  font-size: 13px;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.login-link {
+  display: inline-block;
+  padding: 9px 20px;
+  background: var(--accent-discord);
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-link:hover { background: var(--accent-discord-hover); }
+
+/* ── hash prefix for channels ── */
+.channel-hash {
+  font-size: 17px;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
