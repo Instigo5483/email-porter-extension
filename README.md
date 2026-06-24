@@ -12,6 +12,7 @@ A Chrome extension that lets you share emails from Gmail or Outlook directly to 
 - **Gmail ⋮ menu integration** — a "Share Email" option is injected into Gmail's per-message menu so you can share without opening the popup
 - **Hide sender & recipient** — optionally strip From/To fields before sharing
 - **Attachment support** — email attachments are fetched and forwarded to Discord (up to 7 MB per file)
+- **Email PDF** — a formatted PDF of the email (identical to Gmail's "Save as PDF") is automatically attached to every Discord share
 
 ## Supported Platforms
 
@@ -56,12 +57,14 @@ A Chrome extension that lets you share emails from Gmail or Outlook directly to 
 | `scripting` | Inject content scripts to extract email content |
 | `storage` | Save your Hide Sender preference |
 | `clipboardWrite` | Copy email text to clipboard |
+| `debugger` | Generate a PDF of the email using Chrome's built-in print engine |
 
 ## Notes
 
 - Discord sharing requires you to be **logged into Discord Web** (discord.com) in the same browser — the desktop app alone is not enough
 - File attachments over 7 MB are skipped (Discord's free-tier upload limit)
 - Discord messages over 2000 characters are automatically split and sent in sequence
+- When sharing to Discord, a PDF of the email is automatically generated and attached — this briefly opens a background tab that closes on its own
 
 ## License
 
