@@ -113,7 +113,23 @@ async function quickShare({ destination, hideHeaders, emailIndex = -1 }, tabId) 
   if (data.error)  throw new Error(data.error);
 
   if (destination === 'discord') {
-    return { success: true, plainText: data.plainText, attachmentData: data.attachmentData || [] };
+    const allAtts = [...(data.attachmentData || [])];
+    if (data.printUrl) {
+      try {
+        const pdfBase64 = await generateGmailPdf(data.printUrl);
+        if (pdfBase64) {
+          const byteLen = Math.round(pdfBase64.length * 0.75);
+          if (byteLen <= MAX_ATTACH_BYTES) {
+            const safeName = (data.headers?.subject || 'email')
+              .replace(/[<>:"/\\|?*]/g, '').trim().replace(/\s+/g, '_').slice(0, 80) || 'email';
+            allAtts.unshift({ name: `${safeName}.pdf`, type: 'application/pdf', base64: pdfBase64 });
+          }
+        }
+      } catch (e) {
+        console.warn('Email PDF generation failed:', e.message);
+      }
+    }
+    return { success: true, plainText: data.plainText, attachmentData: allAtts };
   }
 
   if (destination === 'whatsapp') {
@@ -123,6 +139,32 @@ async function quickShare({ destination, hideHeaders, emailIndex = -1 }, tabId) 
   }
 
   throw new Error(`Unknown destination: ${destination}`);
+}
+
+// ── Gmail print-to-PDF via Chrome Debugger API ───────────────────────────────
+
+const MAX_ATTACH_BYTES = 7 * 1024 * 1024;
+
+async function generateGmailPdf(printUrl) {
+  const tab = await chrome.tabs.create({ url: printUrl, active: false });
+  try {
+    await waitForTabLoad(tab.id, 20000);
+    await new Promise(r => setTimeout(r, 2000)); // let Gmail render the print view
+    await chrome.debugger.attach({ tabId: tab.id }, '1.3');
+    try {
+      const result = await chrome.debugger.sendCommand(
+        { tabId: tab.id },
+        'Page.printToPDF',
+        { printBackground: false, paperWidth: 8.5, paperHeight: 11,
+          marginTop: 0.5, marginBottom: 0.5, marginLeft: 0.5, marginRight: 0.5 }
+      );
+      return result?.data || null;
+    } finally {
+      await chrome.debugger.detach({ tabId: tab.id }).catch(() => {});
+    }
+  } finally {
+    await chrome.tabs.remove(tab.id).catch(() => {});
+  }
 }
 
 // ── Discord API ───────────────────────────────────────────────────────────────

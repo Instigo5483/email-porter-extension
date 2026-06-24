@@ -193,6 +193,39 @@
     return lines.join('\n').trim();
   }
 
+  // ── Gmail print URL (used by background to generate real PDF via debugger) ──
+
+  function getGmailPrintUrl(container) {
+    // Method 1: find an existing view=pt link rendered on the page
+    for (const a of document.querySelectorAll('a[href]')) {
+      if (a.href.includes('view=pt')) return a.href;
+    }
+
+    // Method 2: construct from ik key + thread perm ID
+    let ik = null;
+    for (const a of document.querySelectorAll('a[href*="ik="]')) {
+      const m = a.href.match(/[?&]ik=([a-zA-Z0-9]+)/);
+      if (m) { ik = m[1]; break; }
+    }
+    if (!ik) return null;
+
+    // data-thread-perm-id holds the full "thread-f:NUMERIC" string
+    const permEl = document.querySelector('[data-thread-perm-id]');
+    const threadPerm = permEl?.getAttribute('data-thread-perm-id');
+    if (!threadPerm) return null;
+
+    const url = new URL(location.origin + location.pathname);
+    url.searchParams.set('ik', ik);
+    url.searchParams.set('view', 'pt');
+    url.searchParams.set('search', 'all');
+    url.searchParams.set('permthid', threadPerm);
+
+    const msgPermEl = container?.querySelector?.('[data-msg-perm-id]');
+    if (msgPermEl) url.searchParams.set('simpl', msgPermEl.getAttribute('data-msg-perm-id'));
+
+    return url.toString();
+  }
+
   // ── Fetch attachment blobs (same-origin Gmail fetch, auth cookies present) ─
 
   const MAX_ATTACH_BYTES = 7 * 1024 * 1024; // Discord free upload limit
@@ -274,6 +307,7 @@
   }
 
   const attachmentData = (source === 'gmail') ? await fetchAttachmentBlobs(attachments) : [];
+  const printUrl = (source === 'gmail') ? getGmailPrintUrl(container) : null;
 
   return {
     html:           buildHtml(headers, bodyNode, hideHeaders),
@@ -281,6 +315,7 @@
     headers,
     attachments,
     attachmentData,
+    printUrl,
     source,
   };
 })();
